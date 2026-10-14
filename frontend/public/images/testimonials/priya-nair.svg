@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14121c"/><stop offset="1" stop-color="#5b21b6"/></linearGradient></defs>
+<rect width="200" height="200" fill="url(#g)"/><circle cx="164.0" cy="40.0" r="60" fill="none" stroke="#A78BFA" stroke-opacity="0.18" stroke-width="2"/><circle cx="164.0" cy="40.0" r="110" fill="none" stroke="#A78BFA" stroke-opacity="0.13999999999999999" stroke-width="2"/><circle cx="164.0" cy="40.0" r="170" fill="none" stroke="#A78BFA" stroke-opacity="0.09999999999999999" stroke-width="2"/>
+<text x="100.0" y="164.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#F5F3FA" letter-spacing="2">PN</text>
+<text x="100.0" y="172.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="4" fill="#D4F23A" opacity="0.9">PLACEHOLDER IMAGE</text></svg>

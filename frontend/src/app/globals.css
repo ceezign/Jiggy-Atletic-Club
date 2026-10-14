@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+  background-color: #121210;
+  color: #F4F1E8;
+}
+
+::selection {
+  background-color: #E8442A;
+  color: #121210;
+}
+
+/* Visible keyboard focus everywhere — accessibility floor */
+:focus-visible {
+  outline: 2px solid #E8442A;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.container-x {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  .container-x {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
+
+/* Custom scrollbar for horizontally-scrolling schedule tables on mobile */
+.scroll-thin::-webkit-scrollbar {
+  height: 6px;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background-color: #C9A227;
+  border-radius: 4px;
+}
+
+/* ---------- Form controls (shared by every form in the app) ---------- */
+@layer components {
+  .input {
+    @apply w-full rounded-sharp border border-white/15 bg-white/5 px-3.5 py-2.5 text-sm text-ivory placeholder:text-muted/60;
+  }
+  .input:focus {
+    @apply outline-none border-volt;
+  }
+  .input:disabled {
+    @apply opacity-60 cursor-not-allowed;
+  }
+  select.input option {
+    background-color: #16141D;
+    color: #F5F3FA;
+  }
+  /* Browser autofill paints inputs white; keep our dark theme and readable text */
+  .input:-webkit-autofill,
+  .input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #F5F3FA;
+    caret-color: #F5F3FA;
+    box-shadow: 0 0 0 1000px #1F1C2A inset;
+    transition: background-color 9999s ease-in-out 0s;
+  }
+  input[type="checkbox"] {
+    accent-color: #D4F23A;
+  }
+}

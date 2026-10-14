@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#10121f"/><stop offset="1" stop-color="#1f3a8a"/></linearGradient></defs>
+<rect width="800" height="600" fill="url(#g)"/><circle cx="656.0" cy="120.0" r="60" fill="none" stroke="#A78BFA" stroke-opacity="0.18" stroke-width="2"/><circle cx="656.0" cy="120.0" r="110" fill="none" stroke="#A78BFA" stroke-opacity="0.13999999999999999" stroke-width="2"/><circle cx="656.0" cy="120.0" r="170" fill="none" stroke="#A78BFA" stroke-opacity="0.09999999999999999" stroke-width="2"/><g transform="translate(400.0,270.0) scale(1.1)" fill="#D4F23A">
+<rect x="-110" y="-8" width="220" height="16" rx="8"/>
+<rect x="-140" y="-48" width="30" height="96" rx="8"/><rect x="-175" y="-32" width="30" height="64" rx="8"/>
+<rect x="110" y="-48" width="30" height="96" rx="8"/><rect x="145" y="-32" width="30" height="64" rx="8"/></g>
+<text x="400.0" y="491.99999999999994" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="700" fill="#F5F3FA" letter-spacing="2">GROUP FITNESS</text>
+<text x="400.0" y="524.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#D4F23A" opacity="0.9">PLACEHOLDER IMAGE</text></svg>

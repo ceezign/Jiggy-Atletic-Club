@@ -1,0 +1,371 @@
+// Gym Member Platform — Prisma schema
+// Run `npx prisma migrate dev --name init` after setting DATABASE_URL (Supabase connection string)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // Supabase: use the pooled "Transaction" connection string for DATABASE_URL,
+  // and (optionally) the direct connection string for DIRECT_URL below.
+  directUrl = env("DIRECT_URL")
+}
+
+// ---------- Enums ----------
+
+enum FitnessGoal {
+  WEIGHT_LOSS
+  MUSCLE_GAIN
+  ENDURANCE
+  GENERAL_FITNESS
+  STRENGTH
+  FLEXIBILITY
+  REHABILITATION
+  OTHER
+}
+
+enum DifficultyLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  ALL_LEVELS
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum BookingStatus {
+  BOOKED
+  CANCELLED
+  ATTENDED
+  NO_SHOW
+}
+
+enum TrialStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum MembershipStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  PENDING
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+}
+
+// ---------- Core auth / user ----------
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String
+  firstName     String
+  lastName      String
+  phone         String?
+  dateOfBirth   DateTime?
+  emergencyContact String?
+  fitnessGoal   FitnessGoal?
+  profilePhotoUrl String?
+  role          String    @default("MEMBER") // "MEMBER" or "ADMIN"
+  isActive      Boolean   @default(true)
+
+  resetToken       String?
+  resetTokenExpiry DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships       Membership[]
+  classBookings     ClassBooking[]
+  freeTrialBookings FreeTrialBooking[]
+  workouts          Workout[]
+  attendances       Attendance[]
+  progressEntries   Progress[]
+  testimonials      Testimonial[]
+  contactMessages   ContactMessage[]
+
+  @@map("users")
+}
+
+// ---------- Coaches & Activities ----------
+
+model Coach {
+  id             String   @id @default(uuid())
+  firstName      String
+  lastName       String
+  title          String // e.g. "Strength & Conditioning Coach"
+  bio            String
+  photoUrl       String
+  yearsExperience Int
+  specialties    String[] // e.g. ["Strength Training", "Weightlifting"]
+  certifications String[]
+  instagramUrl   String?
+  twitterUrl     String?
+  linkedinUrl    String?
+  isActive       Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  classes  Class[]
+  workouts Workout[]
+
+  @@map("coaches")
+}
+
+model Activity {
+  id              String          @id @default(uuid())
+  name            String          @unique
+  slug            String          @unique
+  description     String
+  imageUrl        String
+  difficultyLevel DifficultyLevel
+  typicalDurationMinutes Int
+  suitableFor     String // free text summary, e.g. "All fitness levels welcome"
+  isActive        Boolean         @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  classes  Class[]
+  workouts Workout[]
+
+  @@map("activities")
+}
+
+// ---------- Classes & Bookings ----------
+
+model Class {
+  id               String    @id @default(uuid())
+  name             String
+  dayOfWeek        DayOfWeek
+  startTime        String // "07:00" 24h format, kept simple & timezone-agnostic
+  endTime          String // "08:00"
+  capacity         Int
+  coachId          String
+  activityId       String
+  isActive         Boolean   @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  coach    Coach          @relation(fields: [coachId], references: [id])
+  activity Activity       @relation(fields: [activityId], references: [id])
+  bookings ClassBooking[]
+
+  @@index([dayOfWeek])
+  @@map("classes")
+}
+
+model ClassBooking {
+  id        String        @id @default(uuid())
+  userId    String
+  classId   String
+  status    BookingStatus @default(BOOKED)
+  bookingDate DateTime    @default(now()) // the calendar date the class occurrence falls on
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  class Class @relation(fields: [classId], references: [id])
+
+  @@unique([userId, classId, bookingDate])
+  @@map("class_bookings")
+}
+
+// ---------- Membership plans ----------
+
+model MembershipPlan {
+  id            String       @id @default(uuid())
+  name          String       @unique // BASIC, STANDARD, PREMIUM, ELITE
+  slug          String       @unique
+  monthlyPrice  Decimal      @db.Decimal(10, 2)
+  billingCycle  BillingCycle @default(MONTHLY)
+  features      String[]
+  isRecommended Boolean      @default(false)
+  displayOrder  Int          @default(0)
+  isActive      Boolean      @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships Membership[]
+
+  @@map("membership_plans")
+}
+
+model Membership {
+  id         String           @id @default(uuid())
+  userId     String
+  planId     String
+  status     MembershipStatus @default(PENDING)
+  startDate  DateTime         @default(now())
+  expiryDate DateTime
+  autoRenew  Boolean          @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan MembershipPlan @relation(fields: [planId], references: [id])
+
+  @@index([userId])
+  @@map("memberships")
+}
+
+// ---------- Free trial ----------
+
+model FreeTrialBooking {
+  id               String      @id @default(uuid())
+  userId           String?     // nullable: a visitor may book before registering
+  fullName         String
+  email            String
+  phone            String
+  preferredDate    DateTime
+  preferredTime    String
+  preferredActivity String
+  fitnessGoal      String?
+  message          String?
+  status           TrialStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("free_trial_bookings")
+}
+
+// ---------- Workouts / Attendance / Progress ----------
+
+model Workout {
+  id          String   @id @default(uuid())
+  userId      String
+  activityId  String?
+  coachId     String?
+  title       String
+  date        DateTime
+  durationMinutes Int
+  notes       String?
+
+  createdAt DateTime @default(now())
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activity Activity? @relation(fields: [activityId], references: [id])
+  coach    Coach?    @relation(fields: [coachId], references: [id])
+
+  @@index([userId])
+  @@map("workouts")
+}
+
+model Attendance {
+  id        String   @id @default(uuid())
+  userId    String
+  visitDate DateTime @default(now())
+  checkInTime DateTime @default(now())
+  note      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("attendance")
+}
+
+model Progress {
+  id                 String   @id @default(uuid())
+  userId             String
+  recordedAt         DateTime @default(now())
+  weightKg           Float?
+  bodyFatPercentage  Float?
+  workoutsCompleted  Int?
+  classesAttended    Int?
+  goalNote           String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("progress")
+}
+
+// ---------- Content: blog, testimonials, contact ----------
+
+model BlogPost {
+  id            String   @id @default(uuid())
+  title         String
+  slug          String   @unique
+  excerpt       String
+  content       String
+  coverImageUrl String
+  category      String
+  authorName    String
+  publishedAt   DateTime @default(now())
+  isPublished   Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@map("blog_posts")
+}
+
+model Testimonial {
+  id             String  @id @default(uuid())
+  userId         String?
+  memberName     String
+  profileImageUrl String?
+  review         String
+  membershipType String?
+  fitnessGoal    String?
+  isPublished    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("testimonials")
+}
+
+model ContactMessage {
+  id      String  @id @default(uuid())
+  userId  String?
+  name    String
+  email   String
+  phone   String?
+  subject String
+  message String
+  isRead  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("contact_messages")
+}
+
+model GalleryImage {
+  id           String   @id @default(uuid())
+  imageUrl     String
+  caption      String?
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+
+  @@map("gallery_images")
+}
