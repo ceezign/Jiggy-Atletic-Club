@@ -6,9 +6,6 @@
 Browse classes, book a free trial, join a plan, track your progress, and manage the whole gym from one place.
 
 
-<!-- 👇 Replace with your hero screenshot (the homepage works well) -->
-<img src="docs/screenshots/hero.png" alt="Jiggy Athletic Club homepage" width="100%" />
-
 [Features](#-features) · [Screenshots](#-screenshots) · [Tech Stack](#-tech-stack) · [Getting Started](#-getting-started) · [Admin Panel](#-admin-panel) · [API](#-api-overview) · [Troubleshooting](#-troubleshooting)
 
 </div>
@@ -237,16 +234,7 @@ Responses use one envelope:
 ```
 
 ---
-
-
-## 🗺 Roadmap
-
-- [ ] Admin tools for workouts, attendance check-ins and blog posts
-- [ ] Payments (Stripe or Paystack) tied to membership plans
-- [ ] Transactional emails (booking confirmations, password reset)
-- [ ] Image uploads in the admin panel (Supabase Storage)
-- [ ] Waitlists for full classes
-
+🔗 Live demo: [Frontend](https://jiggy-atletic-club.vercel.app/), [Backend](https://jiggy-atletic-club.onrender.com/)
 ---
 ## 👨‍💻 Author
 
